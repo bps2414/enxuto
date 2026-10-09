@@ -1,0 +1,6 @@
+{
+  "name": "enxuto",
+  "version": "0.1.0",
+  "description": "Dobra resposta gigante num resumo com botão de abrir, e fecha cada turno com uma linha do que as tools fizeram",
+  "types": "./types/index.d.ts"
+}
