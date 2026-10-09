@@ -2,7 +2,7 @@
 
 Mod pro Claude Code: menos ruído no transcript, com cor.
 
-- **Respostas**: `/enxuto curto` (padrão) pede ao modelo resposta curta mas inteira; `inteiro` deixa como vier; `dobra` dobra resposta longa nas 8 primeiras linhas.
+- **Respostas**: `/enxuto medio` (padrão) pede resposta de tamanho médio que explica para leigo o que foi feito e por quê; `curto` pede resposta curta mas inteira; `inteiro` deixa como vier; `dobra` dobra resposta longa nas 8 primeiras linhas.
 - **Resposta longa** (mais de 14 linhas) ganha uma linha de botões: `encolher` / `abrir`, `salvar` (em `respostas/<data>.md` da pasta do projeto) e `copiar`. `/salvar` salva a última.
 - **Tools**: cada chamada vira uma linha colorida pelo tipo, sem o resultado; chamada que falha aparece inteira. `/enxuto tools` liga e desliga.
 - **Faixa acima do prompt**: um bloco por tool call do turno e o que está rodando agora.

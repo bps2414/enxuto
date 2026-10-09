@@ -7,13 +7,13 @@ import { isTheme, kindOf, NAMES, nextTheme, THEMES } from './theme'
 
 const PANE = 'enxuto-turno'
 const MIN_TOOLS = 3 // a turn with fewer calls gets no digest line: the rows above already say it
-const MODES = ['curto', 'inteiro', 'dobra'] as const
+const MODES = ['medio', 'curto', 'inteiro', 'dobra'] as const
 type Mode = (typeof MODES)[number]
 const isMode = (value: unknown): value is Mode => MODES.some(m => m === value)
 // tools whose row is the content itself: a question, a plan, a file handed over
 const FULL = new Set(['AskUserQuestion', 'TodoWrite', 'ExitPlanMode', 'Agent', 'Artifact', 'SendUserFile', 'TaskCreate', 'TaskUpdate'])
 
-const mode = atom({ plugin: 'enxuto', key: 'mode' } as const, 'curto')
+const mode = atom({ plugin: 'enxuto', key: 'mode' } as const, 'medio')
 const isLean = atom({ plugin: 'enxuto', key: 'isLean' } as const, true)
 const calls = atom({ plugin: 'enxuto', key: 'calls' } as const, [])
 const view = atom({ plugin: 'enxuto', key: 'view' } as const, '')
@@ -21,8 +21,9 @@ const theme = atom({ plugin: 'enxuto', key: 'theme' } as const, 'neon')
 const lastMs = atom({ plugin: 'enxuto', key: 'lastMs' } as const, 0)
 const lastAnswer = atom({ plugin: 'enxuto', key: 'lastAnswer' } as const, '')
 
-// What the model is told per mode: `curto` gets a short whole reply, `dobra` one that opens with its point (the fold shows the first lines only).
+// What the model is told per mode: `medio` gets an explained reply of bounded size, `curto` gets a short whole reply, `dobra` one that opens with its point (the fold shows the first lines only).
 const ASK: Record<Mode, string | undefined> = {
+  medio: 'Resposta final de um turno: tamanho médio (cerca de 15 a 30 linhas), escrita para alguém leigo que precisa entender o que foi feito para orientar o trabalho. Nesta ordem: (1) o resultado em uma ou duas frases; (2) o que você fez, passo a passo, em linguagem simples, dizendo o porquê de cada passo; (3) o que mudou e onde; (4) o que não deu certo ou não foi verificado; (5) o que a pessoa precisa decidir ou pode pedir em seguida. Explique cada termo técnico na primeira vez que aparecer, em poucas palavras ou com uma comparação do dia a dia. Frases completas, sem abreviar. Não cole saída de tool nem código longo: descreva o que eles mostram. Se o assunto pedir mais que isso, prefira explicar bem o essencial e avisar o que ficou de fora.',
   curto: 'Resposta final de um turno: curta, mas inteira. Abra com a conclusão; depois só o que a pessoa precisa para decidir ou agir. Não recapitule passos, não repita o que as tools já mostraram, não liste o que não mudou, não ofereça próximos passos óbvios. Corte palavras, nunca informação. Se a pessoa pedir detalhe ou explicação longa, dê inteira.',
   inteiro: undefined,
   dobra: 'Na resposta final de um turno, abra com a conclusão em até 2 linhas (o que foi feito ou a resposta direta); os detalhes vêm depois. A interface dobra respostas longas e mostra só o começo.',
@@ -31,7 +32,7 @@ const ASK: Record<Mode, string | undefined> = {
 const modeNow = async ($: EngineInterface): Promise<Mode> => {
   const name = await read($, mode)
 
-  return isMode(name) ? name : 'curto'
+  return isMode(name) ? name : 'medio'
 }
 
 const palette = async ($: EngineInterface) => {
@@ -88,7 +89,8 @@ export const register: Register = on => {
     }
     const lines = [
       `enxuto: ${await modeNow($)}${(await read($, isLean)) ? ' · tools numa linha' : ''}`,
-      '  curto: resposta curta mas inteira (vale do próximo prompt)',
+      '  medio: tamanho médio, tudo explicado para leigo (vale do próximo prompt)',
+      '  curto: resposta curta mas inteira',
       '  inteiro: resposta como vier',
       '  dobra: resposta longa dobrada, com botão de abrir',
       '  tools: liga/desliga tools numa linha',
